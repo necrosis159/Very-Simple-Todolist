@@ -4,18 +4,25 @@
     {{ controller_name }}!{% endblock %}
 
 {% block body %}
-    <style>input{
-     border:none;
-    background-image:none;
-    background-color:transparent;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-    color:white;
-    }
-    input::placeholder{color:white;}
-    #addTL input::placeholder{color:black;}
-    #addTL input{color:black;}
+    <style>
+        input {
+            border: none;
+            background-image: none;
+            background-color: transparent;
+            -webkit-box-shadow: none;
+            -moz-box-shadow: none;
+            box-shadow: none;
+            color: white;
+        }
+        input::placeholder {
+            color: white;
+        }
+        #addTL input::placeholder {
+            color: black;
+        }
+        #addTL input {
+            color: black;
+        }
     </style>
     <h1>{{project.name}}</h1>
     {% for tasklist in tasklists %}
@@ -29,8 +36,10 @@
             {% for task in tasks %}
                 {% if task.idList == tasklist.id %}
                     <div style="position:relative; background-color:grey; padding: 10px; color:white; margin-bottom: 10px;">{{task.name}}
-                        <div class="option" style="position:absolute; right: 10px; top:12px;"><a href="#" onclick="delTask({{task.id}});">
-                            <span style="color:red;" class="glyphicon glyphicon-trash" aria-hidden="true"></span></a></div>
+                        <div class="option" style="position:absolute; right: 10px; top:12px;">
+                            <a href="#" onclick="delTask({{task.id}});">
+                                <span style="color:red;" class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
+                        </div>
                     </div>
                 {% endif %}
             {% endfor %}

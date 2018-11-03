@@ -2,10 +2,10 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\TodoList;
 use App\Entity\TodoTaskList;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
 
 class ProjectController extends AbstractController
 {
@@ -19,10 +19,10 @@ class ProjectController extends AbstractController
             ->findAll();
 
         if (!$projects) {
-           $projects = "empty";
+            $projects = "empty";
         }
         return $this->render('project/index.html.twig', [
-            'controller_name' => 'ProjectController', 'projects' => $projects
+            'controller_name' => 'ProjectController', 'projects' => $projects,
         ]);
     }
     /**
@@ -121,7 +121,7 @@ class ProjectController extends AbstractController
         $tasks = $query->getScalarResult();
 
         return $this->render('project/indexShow.html.twig', [
-            'controller_name' => 'ProjectController', 'project' => $project, 'tasklists' => $tasklists, 'tasks' => $tasks
+            'controller_name' => 'ProjectController', 'project' => $project, 'tasklists' => $tasklists, 'tasks' => $tasks,
         ]);
     }
 }

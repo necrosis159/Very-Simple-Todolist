@@ -2,13 +2,12 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\User;
 use App\Form\UserType;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserController extends AbstractController
 {
@@ -39,8 +38,8 @@ class UserController extends AbstractController
             $entityManager->flush();
 
             $users = $this->getDoctrine()
-            ->getRepository(\App\Entity\User::class)
-            ->findAll();
+                ->getRepository(\App\Entity\User::class)
+                ->findAll();
             return $this->render('user/index.html.twig', ['users' => $users, 'form' => $form->createView()]);
         }
 

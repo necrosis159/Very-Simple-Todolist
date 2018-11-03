@@ -10,7 +10,6 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class UserType extends AbstractType
 {
@@ -18,32 +17,32 @@ class UserType extends AbstractType
     {
         $builder
             ->add('email', EmailType::class, array('label' => false,
-            'attr' => ['class' => 'btn btn-default pull-right', 'placeholder' => "Adresse email"],
-        ))
+                'attr' => ['class' => 'btn btn-default pull-right', 'placeholder' => "Adresse email"],
+            ))
             ->add('username', TextType::class, array('label' => false,
                 'attr' => ['class' => 'btn btn-default pull-right', 'placeholder' => "Nom d'utilisateur"],
             )
             )
             ->add('firstname', TextType::class, array('label' => false,
-            'attr' => ['class' => 'btn btn-default pull-right', 'placeholder' => "Prénom"],
-        ))
+                'attr' => ['class' => 'btn btn-default pull-right', 'placeholder' => "Prénom"],
+            ))
             ->add('lastname', TextType::class, array('label' => false,
-            'attr' => ['class' => 'btn btn-default pull-right', 'placeholder' => "Nom de famille"],
-        ))
+                'attr' => ['class' => 'btn btn-default pull-right', 'placeholder' => "Nom de famille"],
+            ))
             ->add('is_active', ChoiceType::class, array(
                 'label' => false,
                 'choices' => array(
                     'Oui' => true,
                     'Non' => false,
                 ),
-                'attr' => ['class' => 'form-control']
+                'attr' => ['class' => 'form-control'],
             ))
             ->add('businessname', TextType::class, array('label' => false,
-            'attr' => ['class' => 'btn btn-default pull-right', 'placeholder' => "Nom de l'entreprise"],
-        ))
+                'attr' => ['class' => 'btn btn-default pull-right', 'placeholder' => "Nom de l'entreprise"],
+            ))
             ->add('job', TextType::class, array('label' => false,
-            'attr' => ['class' => 'btn btn-default pull-right', 'placeholder' => "Titre de poste"],
-        ))
+                'attr' => ['class' => 'btn btn-default pull-right', 'placeholder' => "Titre de poste"],
+            ))
             ->add('rules', ChoiceType::class, array(
                 'label' => false,
                 'choices' => array(
@@ -53,7 +52,7 @@ class UserType extends AbstractType
                     'Trading' => 'ROLE_TRADING',
                     'Technique' => 'ROLE_TECHNIQUE',
                 ),
-                'attr' => ['class' => 'form-control']
+                'attr' => ['class' => 'form-control'],
             ))
             ->add('plainPassword', RepeatedType::class, array(
                 'type' => PasswordType::class,
@@ -61,7 +60,7 @@ class UserType extends AbstractType
                 'second_options' => array('label' => false, 'attr' => ['class' => 'btn btn-default pull-right', 'placeholder' => "Répéter le mot de passe"]),
                 'label' => false,
                 'attr' => ['class' => 'btn btn-default pull-right', 'placeholder' => "Nom d'utilisateur"],
-            
+
             ))
         ;
     }
