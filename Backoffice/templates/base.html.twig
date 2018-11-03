@@ -1,12 +1,185 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <meta charset="UTF-8"><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
+        <title>
+            {% block title %}Welcome!{% endblock %}
+        </title>
         {% block stylesheets %}{% endblock %}
+        <style>
+            body {
+                margin: 0;
+                font-family: 'Roboto', sans-serif;
+            }
+            #leftMenu {
+                background: #312d45;
+                width: 230px;
+                float: left;
+                color: white;
+                height: 100vh;
+            }
+            #leftMenu .nav_title img {
+                max-width: 210px;
+                margin: 10px auto;
+                display: block;
+            }
+            .content {
+                padding: 10px;
+                float: left;
+                width:calc(100% - 230px);
+                background-color: #eaedf3;
+                min-height: 100vh;
+            }
+            .profile_pic {
+                width: 35%;
+                float: left;
+            }
+            .img-circle.profile_img {
+                width: 70%;
+                margin-left: 15%;
+                z-index: 1000;
+                position: inherit;
+                margin-top: 20px;
+                border: 1px solid rgba(52, 73, 94, .44);
+                padding: 4px;
+            }
+            .profile_info {
+                padding: 25px 10px 10px;
+                width: 65%;
+                float: left;
+            }
+            .profile_info span {
+                font-size: 13px;
+                line-height: 30px;
+                color: #BAB8B8;
+            }
+            .profile_info h2 {
+                font-size: 14px;
+                color: #ECF0F1;
+                margin: 0;
+                font-weight: 300;
+            }
+            .sidebar-nav {
+                padding: 10px;
+                position: relative;
+                flex: 1;
+                overflow-x: hidden;
+                overflow-y: auto;
+                transition: width 0.25s;
+            }
+            .nav {
+                display: flex;
+                flex-wrap: wrap;
+                margin-bottom: 0;
+                list-style: none;
+            }
+            .nav li {
+                position: relative;
+                display: list-item;
+                margin: 0;
+                transition: background 0.3s ease-in-out;
+                width: 100%;
+            }
+            .nav-link {
+                display: block;
+            }
+            .nav a {
+                color: white;
+            }
+            .nav a:hover{
+                background-color: #29253a !important;
+            }
+            .sidebar-footer {
+                bottom: 0;
+                clear: both;
+                display: block;
+                padding: 5px 0 0;
+                position: fixed;
+                background: #312d45;
+                width: 230px;
+                z-index: 456;
+            }
+            .sidebar-footer a {
+                padding: 7px 0 3px;
+                text-align: center;
+                width: 25%;
+                font-size: 17px;
+                display: block;
+                float: left;
+                background: #29253a;
+                cursor: pointer;
+            }
+            .sidebar-footer a:hover {
+                background: #29253a;
+            }
+            .sidebar-footer a span{
+                color : #86d62f;
+            }
+            h1{
+                text-align:center;
+            }
+        </style>
     </head>
     <body>
-        {% block body %}{% endblock %}
+        <div class="left_col" id='leftMenu'>
+            <div class="navbar nav_title" style="border: 0;">
+                <a href="/"><img src="/img/logo_white.png"></a>
+            </div>
+            <div class="clearfix"></div>
+            <div class="profile clearfix">
+                <div class="profile_pic">
+                    <img src="/avatar/mathias.png" alt="..." class="img-circle profile_img">
+                </div>
+                <div class="profile_info">
+                    <span>Bienvenue,</span>
+                    <h2>Mathias-Rui Lopes</h2>
+                </div>
+            </div>
+            <br>
+            <div class="sidebar-nav open">
+                <h3>General</h3>
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/project">
+                            <i class="fa fa-dashboard fa-sm"></i>
+                            <span class="menu-titre">
+                                PROJET</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/user">
+                            <i class="fa fa-dashboard fa-sm"></i>
+                            <span class="menu-titre">
+                                UTILISATEUR</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="sidebar-footer hidden-small">
+                <a data-toggle="tooltip" data-placement="top" title="" data-original-title="Settings">
+                    <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                </a>
+                <a data-toggle="tooltip" data-placement="top" title="" data-original-title="FullScreen">
+                    <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+                </a>
+                <a data-toggle="tooltip" data-placement="top" title="" data-original-title="Lock">
+                    <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+                </a>
+                <a data-toggle="tooltip" data-placement="top" title="" href="login.html" data-original-title="Logout">
+                    <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+                </a>
+            </div>
+            <!-- /menu footer buttons -->
+        </div>
+        <div class=" content" role="main">
+            {% block body %}{% endblock %}
+        </div>
         {% block javascripts %}{% endblock %}
     </body>
 </html>

@@ -1,0 +1,162 @@
+{% extends 'base.html.twig' %} {% block title %}Hello!{% endblock %} {% block body %}
+<div id="headerGestion">
+<center>
+    <span class="display-3" style="font-size:2rem;color:#ff0000;">Mis à jour utilisateur</span>
+</center>
+</div>
+{{ form_start(form) }}
+<div id="adduser_right">
+    <div class="jumbotron">
+        <center style="padding-bottom: 30px;">
+            <span style="font-size: 1.5rem;padding-top:40px !important;" class="display-4">Administration</span>
+        </center>
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">
+                        <i class="fa fa-bolt"></i>
+                    </span>
+                </div>
+
+                <div class="input_div_right">{{ form_row(form.is_active) }}</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">
+                        <i class="fa fa-cog"></i>
+                    </span>
+                </div>
+
+                <div class="input_div_right">{{ form_row(form.rules) }}</div>
+            </div>
+        </div>
+    </div>
+    <button type="submit" class=" btn btn-sm btn-success administration" style="width:100%;">
+        <i class="fa fa-check fa-lg"></i> Modifier</button>
+    <button type="reset" class=" btn btn-sm btn-danger administration" style="width:100%;">
+        <i class="fa fa-ban fa-lg"></i> Effacer</button>
+</div>
+
+<div id="adduser_left" class="jumbotron">
+    <center style="padding-bottom: 30px;">
+        <span style="font-size: 1.5rem;padding-top:40px !important;" class="display-4">Compte utilisateur</span>
+    </center>
+    <div class="form-group">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    <i class="fa fa-envelope"></i>
+                </span>
+            </div>
+
+            <div class="input_div"> {{ form_row(form.email, {attr: {value: '' } }) }}</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    <i class="fa fa-user"></i>
+                </span>
+            </div>
+            <div class="input_div">{{ form_row(form.username) }}</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    <i class="fa fa-asterisk"></i>
+                </span>
+            </div>
+
+            <div class="input_div">{{ form_row(form.plainPassword.first) }}</div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    <i class="fa fa-asterisk"></i>
+                </span>
+            </div>
+
+            <div class="input_div">{{ form_row(form.plainPassword.second) }}</div>
+        </div>
+    </div>
+</div>
+<div id="adduser_left" class="jumbotron">
+    <center style="padding-bottom: 30px;">
+        <span style="font-size: 1.5rem;padding-top:40px !important;" class="display-4">Information sur le client</span>
+    </center>
+    <div class="form-group">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    <i class="fa fa-vcard-o"></i>
+                </span>
+            </div>
+
+            <div class="input_div">{{ form_row(form.firstname) }}</div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    <i class="fa fa-vcard-o"></i>
+                </span>
+            </div>
+
+            <div class="input_div">{{ form_row(form.lastname) }}</div>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    <i class="fa fa-building"></i>
+                </span>
+            </div>
+
+            <div class="input_div">{{ form_row(form.businessname) }}</div>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    <i class="fa fa-briefcase"></i>
+                </span>
+            </div>
+
+            <div class="input_div">{{ form_row(form.job) }}</div>
+        </div>
+    </div>
+
+</div>
+{{ form_end(form) }}
+<script>
+    console.log('oui');
+    {% for user in users %}
+    $('#user_email').attr('value', "{{user.email}}");
+    $('#user_username').attr('value', "{{user.username}}");
+    $('#user_plainPassword_first').attr('value', "{{user.password}}");
+    $('#user_plainPassword_second').attr('value', "{{user.password}}");
+    $('#user_firstname').attr('value', "{{user.firstname}}");
+    $('#user_lastname').attr('value', "{{user.lastname}}");
+    $('#user_businessname').attr('value', "{{user.businessname}}");
+    $('#user_job').attr('value', "{{user.job}}");
+    $('#user_is_active option[value="{{user.isactive}}"]').attr('selected', true);
+    $('#user_rules option[value="{{user.rules}}"]').attr('selected', true);
+    {% endfor %}
+</script> {% endblock %}
