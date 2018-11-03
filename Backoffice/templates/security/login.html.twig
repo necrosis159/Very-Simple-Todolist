@@ -5,11 +5,9 @@
 
         <img height="50" src="/img/logo.png">
         {% if error %}
-            <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-            {{error}}
+            <div>🙈{{ error.messageKey|trans(error.messageData, 'security') }}🙈</div>
         {% endif %}
 
-        <img src="{{ asset('img/brand/logo.svg') }}" id="logoprelogin" alt="" style="width:300px;height:auto;margin-bottom:50px;">
         <div class="card-body"><br>
             <p class="text-muted">Veuillez vous identifier</p>
             <form action="{{ path('login') }}" method="post">
