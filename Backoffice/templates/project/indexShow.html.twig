@@ -5,6 +5,57 @@
 
 {% block body %}
     <style>
+        /* The Modal (background) */
+
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 100000;
+            /* Sit on top */
+            padding-top: 100px;
+            /* Location of the box */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgb(0, 0, 0);
+            /* Fallback color */
+            background-color: rgba(0, 0, 0, 0.4);
+            /* Black w/ opacity */
+        }
+
+        /* Modal Content */
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 1220px;
+        }
+
+        /* The Close Button */
+
+        .close {
+            color: #aaaaaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:focus,
+        .close:hover {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
         input {
             border: none;
             background-image: none;
@@ -23,8 +74,84 @@
         #addTL input {
             color: black;
         }
+        #btn-projet{
+            cursor: pointer;
+        }
+
+
+        .content {
+  display: block;
+  position: relative;
+  background: #eaedf300;
+}
+
+.content::after {
+  content: "";
+            background: url("/img/{{project.logo}}") no-repeat fixed center;
+  opacity: 0.5;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  z-index: -1;   
+}
+#ProjectPage{
+    background-color: rgba(234, 237, 243, 0.7);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
     </style>
-    <h1>{{project.name}}</h1>
+    <!-- Modal content -->
+    <div id="ProjectPage">
+    <div id="myModal-projet" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+
+            <h3 style="text-align:center;">MODIFIER LE NOM DU PROJET</h3><br>
+            <input id="project-update-input" value="{{project.name}}" style="color:black; width:100%; border:1px;"><br>
+            <button id="project-update-button" onclick="projectUpdate({{project.id}})" type="button">Enregistrer</button>
+            <hr>
+            <span class="display-3" style="margin:auto;">Modifier l'image</span>
+            {{ form_start(form) }}
+            {{ form_row(form.logo) }}
+            <button type="submit" class=" btn btn-sm btn-success administration" style="width:100%;">
+                Mettre en ligne</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    <!-- Modal content -->
+    <div id="myModal-task" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+
+            <h3 style="text-align:center;">MODIFIER LE NOM DU TASK</h3><br>
+            <input id="task-update-input" value="" style="color:black; width:100%; border:1px;"><br>
+            <input id="task-update-id" style="display:none;">
+            <button id="task-update-button" onclick="updateTask()" type="button">Enregistrer</button>
+        </div>
+    </div>
+
+    <!-- Modal content -->
+    <div id="myModal-tasklist" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+
+            <h3 style="text-align:center;">MODIFIER LE NOM DU TASKLIST</h3><br>
+            <input id="tasklist-update-input" value="" style="color:black; width:100%; border:1px;"><br>
+            <input id="tasklist-update-id" style="display:none;">
+            <button id="tasklist-update-button" onclick="updateTask()" type="button">Enregistrer</button>
+        </div>
+    </div>
+
+    <h1>{{project.name}}
+        -
+        <span id='btn-projet' class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+    </h1>
     {% for tasklist in tasklists %}
         <div class="tasklist" style="position:relative; width: 200px; min-height: 200px; background:white; radius:10px; padding: 10px; margin: 0 10px 0 10px;float:left;">
             <div class="option" style="position:absolute; right: 10px;">
@@ -37,6 +164,9 @@
                 {% if task.idList == tasklist.id %}
                     <div style="position:relative; background-color:grey; padding: 10px; color:white; margin-bottom: 10px;">{{task.name}}
                         <div class="option" style="position:absolute; right: 10px; top:12px;">
+                            <a href="#" onclick='updateModal({{task.id}},"{{task.name|e('js')}}")'>
+                            <span style="color:green;" class="btn-update-task glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                            </a>
                             <a href="#" onclick="delTask({{task.id}});">
                                 <span style="color:red;" class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
                         </div>
@@ -49,18 +179,35 @@
     <div id="addTL" style="width: 200px; background:white; radius:10px; padding: 10px; margin: 0 10px 0 10px;float:left;">
         <input id="addTaskList" placeholder="Ajouter une liste...">
     </div>
+    <button style="display:none;" id="btn-update-open">
     <script>
+        function updateModal(id,name){
+            $('#task-update-input').val(name);
+            $('#task-update-id').val(id);
+            $('#btn-update-open').click();
+        }
+        function updateTask(){
+            var name = $('#task-update-input').val();
+            var id = $('#task-update-id').val();
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "/project/updateTask/" + id + "/" + name, true);
+            xhttp.send();
+            //location.reload();
+            setTimeout(function(){ location.reload() }, 500);
+        }
         function delList(id) {
             var xhttp = new XMLHttpRequest();
             xhttp.open("GET", "/project/delTaskList/" + id, true);
             xhttp.send();
-            location.reload();
+            //location.reload();
+            setTimeout(function(){ location.reload() }, 500);
         }
         function delTask(id) {
             var xhttp = new XMLHttpRequest();
             xhttp.open("GET", "/project/delTask/" + id, true);
             xhttp.send();
-            location.reload();
+            //location.reload();
+            setTimeout(function(){ location.reload() }, 500);
         }
 
         document.getElementById("addTaskList").onkeypress = function (event) {
@@ -69,7 +216,8 @@
                 var xhttp = new XMLHttpRequest();
                 xhttp.open("GET", "/project/addTaskList/" + {{project.id}} + "/" + val, true);
                 xhttp.send();
-                location.reload();
+                //location.reload();
+            setTimeout(function(){ location.reload() }, 500);
             }
         };
 
@@ -82,9 +230,70 @@
                 var xhttp = new XMLHttpRequest();
                 xhttp.open("GET", "/project/addTask/" + {{project.id}} + "/" + taskListId + "/" + val, true);
                 xhttp.send();
-                location.reload();
+                //location.reload();
+            setTimeout(function(){ location.reload() }, 500);
             }
 
         });
-    </script>
+
+        // Get the modal
+        var modalProjet = document.getElementById('myModal-projet');
+
+        // Get the button that opens the modal
+        var btnProjet = document.getElementById("btn-projet");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal
+        btnProjet.onclick = function () {
+            modalProjet.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modalProjet.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modalProjet) {
+                modalProjet.style.display = "none";
+            }
+        }
+
+        // Get the modal
+        var modal = document.getElementById('myModal-task');
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("btn-update-open");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[1];
+
+        // When the user clicks the button, open the modal
+        btn.onclick = function () {
+            modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        function projectUpdate(id) {
+            var name = $('#project-update-input').val();
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "/project/update/" + id + "/" + name, true);
+            xhttp.send();
+            setTimeout(function(){ location.reload() }, 500);
+        }
+    </script></div>
 {% endblock %}

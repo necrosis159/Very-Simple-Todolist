@@ -52,4 +52,11 @@ class SecurityController extends Controller
             array('form' => $form->createView())
         );
     }
+    /**
+     * @Route("/logoff", name="logoff")
+     */
+    public function logoff()
+    {
+        session_destroy();
+    }
 }

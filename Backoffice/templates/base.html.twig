@@ -33,7 +33,7 @@
                 padding: 10px;
                 float: left;
                 width: calc(100% - 230px);
-                background-color: #eaedf3;
+                background: #eaedf3;
                 min-height: 100vh;
             }
             .profile_pic {
@@ -171,7 +171,7 @@
                 <a data-toggle="tooltip" data-placement="top" title="" data-original-title="Lock">
                     <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
                 </a>
-                <a data-toggle="tooltip" data-placement="top" title="" href="login.html" data-original-title="Logout">
+                <a data-toggle="tooltip" data-placement="top" title="" href="#" onclick="logoff()" data-original-title="Logout">
                     <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
                 </a>
             </div>
@@ -181,5 +181,14 @@
             {% block body %}{% endblock %}
         </div>
         {% block javascripts %}{% endblock %}
+        <script>
+        function logoff() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "/logoff/", true);
+            xhttp.send();
+            //location.reload();
+            setTimeout(function(){ location.reload() }, 500);
+        }
+        </script>
     </body>
 </html>
