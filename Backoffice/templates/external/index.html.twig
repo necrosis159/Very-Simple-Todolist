@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello
+    {{ controller_name }}!{% endblock %}
+
+{% block body %}
+
+    <style>
+        .listExternal {
+            margin: 1em auto;
+            max-width: calc(100% - 230px);
+            width: 95%;
+            font: 18px/1.5 sans-serif;
+        }
+    </style>
+
+    <div class="listExternal">
+        <h1>Liste des accès externe</h1><br><div style="text-align:center;">Mise à jour "Peut Editer" - Coming Soon</div>
+        <table id="table_id" class="display">
+            <thead>
+                <tr>
+                    <th>Nom du projet</th>
+                    <th>Peut editer?</th>
+                    <th>URL</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in OutsideAccess %}
+                <tr>
+                    <td>{{item.name}}</td>
+                    <td>{% if item.canEdit == 1 %}Oui{% else %}Non{% endif %}</td>
+                    <td><a href="/external/{{item.identifier}}" target="_BLANK">/external/{{item.identifier}} <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span></a></td>
+                    <td><span class="glyphicon glyphicon-trash" style="color:red; cursor:pointer;" onClick="delAccess({{item.id}})" aria-hidden="true"></span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $('#table_id').DataTable();
+        });
+        function delAccess(id){
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "/listExternal/delete/" + id, true);
+            xhttp.send();
+            setTimeout(function(){ location.reload() }, 500);
+        }
+    </script>
+{% endblock %}
