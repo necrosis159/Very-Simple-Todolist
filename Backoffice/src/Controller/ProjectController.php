@@ -2,15 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Log;
+use App\Entity\OutsideAccess;
+use App\Entity\Project;
 use App\Entity\TodoList;
 use App\Entity\TodoTaskList;
-use App\Entity\Project;
-use App\Entity\OutsideAccess;
-use App\Entity\Log;
 use App\Form\ProjectLogoType;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ProjectController extends AbstractController
@@ -18,17 +17,21 @@ class ProjectController extends AbstractController
     /**
      * @return string
      */
-    private function getActiveUser(){
-        $usr= $this->get('security.token_storage')->getToken()->getUser();
+    private function getActiveUser()
+    {
+        $usr = $this->get('security.token_storage')->getToken()->getUser();
         return $usr->getUsername();
     }
-     /**
-     * 
+    /**
+     *
+     * Create a outsideaccess. Used only by Jquery.
+     *
      *  Matches /project/outsideAccess/*
-     * 
+     *
      * @Route("/project/outsideAccess/{projectId}/{canEdit}/{name}", name="outsideAccess")
      */
-    public function outsideAccess($projectId, $canEdit,$name){
+    public function outsideAccess($projectId, $canEdit, $name)
+    {
         $entityManager = $this->getDoctrine()->getManager();
         $OutsideAccess = new OutsideAccess();
         $OutsideAccess->setIdentifier(uniqid());
@@ -43,11 +46,13 @@ class ProjectController extends AbstractController
         $log->setIdProject($projectId);
         $entityManager->persist($log);
 
-
         $entityManager->flush();
     }
 
     /**
+     *
+     * Return all the project
+     *
      * @Route("/project", name="project")
      */
     public function index()
@@ -66,6 +71,8 @@ class ProjectController extends AbstractController
 
     /**
      *
+     * Archive a task list. Used only by Jquery.
+     *
      * Matches /project/archiveTaskList/*
      *
      * @Route("/project/archiveTaskList/{id}", name="archiveTaskList")
@@ -79,7 +86,7 @@ class ProjectController extends AbstractController
 
         $log = new Log();
         $log->setUser($this->getActiveUser());
-        $log->setAction('Archived the tasklist: '.$id);
+        $log->setAction('Archived the tasklist: ' . $id);
         $log->setIdProject($tasklist->getIdProject());
         $entityManager->persist($log);
 
@@ -87,6 +94,8 @@ class ProjectController extends AbstractController
     }
 
     /**
+     *
+     * Check if a list is done or not. If it is, archive it automatically. Used only by Jquery.
      *
      * Matches /project/isListDone/*
      *
@@ -107,19 +116,19 @@ class ProjectController extends AbstractController
         $numberOfLoops = 0;
         foreach ($tasklists as $task) {
             $numberOfLoops++;
-            if($task['isDone'] == 1){
+            if ($task['isDone'] == 1) {
                 $numberOfTaskDone++;
             }
         }
-        if($numberOfLoops == $numberOfTaskDone){
+        if ($numberOfLoops == $numberOfTaskDone) {
             $tasklist = $this->getDoctrine()
-            ->getRepository(TodoList::class)
-            ->find($id);
+                ->getRepository(TodoList::class)
+                ->find($id);
             $tasklist->setIsArchived(1);
 
             $log = new Log();
             $log->setUser($this->getActiveUser());
-            $log->setAction('Automatically archived the tasklist: '.$id);
+            $log->setAction('Automatically archived the tasklist: ' . $id);
             $log->setIdProject(null);
             $dm->persist($log);
 
@@ -128,6 +137,8 @@ class ProjectController extends AbstractController
     }
 
     /**
+     *
+     * Restore a tasklist. Used only by Jquery.
      *
      * Matches /project/restoreTaskList/*
      *
@@ -142,7 +153,7 @@ class ProjectController extends AbstractController
 
         $log = new Log();
         $log->setUser($this->getActiveUser());
-        $log->setAction('Restored a tasklist: '.$id);
+        $log->setAction('Restored a tasklist: ' . $id);
         $log->setIdProject($tasklist->getIdProject());
         $entityManager->persist($log);
 
@@ -150,6 +161,9 @@ class ProjectController extends AbstractController
     }
 
     /**
+     *
+     * Add a project.
+     *
      * @Route("/project/add/{name}", name="projectadd")
      */
     public function projectadd($name)
@@ -161,15 +175,16 @@ class ProjectController extends AbstractController
 
         $log = new Log();
         $log->setUser($this->getActiveUser());
-        $log->setAction('Created a new projet: '.$name);
+        $log->setAction('Created a new projet: ' . $name);
         $log->setIdProject(null);
         $entityManager->persist($log);
-
 
         $entityManager->flush();
     }
 
-     /**
+    /**
+     *
+     * Update a project
      * @Route("/project/update/{id}/{name}", name="projectupdate")
      */
     public function projectupdate($id, $name)
@@ -179,7 +194,7 @@ class ProjectController extends AbstractController
 
         if (!$project) {
             throw $this->createNotFoundException(
-                'No product found for id '.$id
+                'No product found for id ' . $id
             );
         }
 
@@ -187,25 +202,27 @@ class ProjectController extends AbstractController
 
         $log = new Log();
         $log->setUser($this->getActiveUser());
-        $log->setAction('Updated the project with a new name: '.$name);
+        $log->setAction('Updated the project with a new name: ' . $name);
         $log->setIdProject($id);
         $entityManager->persist($log);
-
 
         $entityManager->flush();
     }
 
-     /**
+    /**
+     *
+     * Update a task name. Used only by Jquery.
+     *
      * @Route("/project/updateTask/{id}/{name}", name="updateTask")
      */
     public function updateTask($id, $name)
     {
         $entityManager = $this->getDoctrine()->getManager();
         $project = $entityManager->getRepository(TodoTaskList::class)->find($id);
-        
+
         if (!$project) {
             throw $this->createNotFoundException(
-                'No product found for id '.$id
+                'No product found for id ' . $id
             );
         }
 
@@ -213,14 +230,17 @@ class ProjectController extends AbstractController
 
         $log = new Log();
         $log->setUser($this->getActiveUser());
-        $log->setAction('Updated the task: '.$id.'. New Name: '.$name);
+        $log->setAction('Updated the task: ' . $id . '. New Name: ' . $name);
         $log->setIdProject($project->getIdProject());
         $entityManager->persist($log);
 
         $entityManager->flush();
     }
 
-     /**
+    /**
+     *
+     * Update a task list name. Used only by Jquery.
+     *
      * @Route("/project/updateTaskList/{id}/{name}", name="updateTaskList")
      */
     public function updateTaskList($id, $name)
@@ -230,7 +250,7 @@ class ProjectController extends AbstractController
 
         if (!$project) {
             throw $this->createNotFoundException(
-                'No product found for id '.$id
+                'No product found for id ' . $id
             );
         }
 
@@ -238,7 +258,7 @@ class ProjectController extends AbstractController
 
         $log = new Log();
         $log->setUser($this->getActiveUser());
-        $log->setAction('Updated the task list: '.$id.'. New Name: '.$name);
+        $log->setAction('Updated the task list: ' . $id . '. New Name: ' . $name);
         $log->setIdProject($project->getIdProject());
         $entityManager->persist($log);
 
@@ -246,6 +266,8 @@ class ProjectController extends AbstractController
     }
 
     /**
+     *
+     * Delete a tasklist. Used only by Jquery.
      *
      * Matches /project/delTaskList/*
      *
@@ -258,7 +280,7 @@ class ProjectController extends AbstractController
 
         $log = new Log();
         $log->setUser($this->getActiveUser());
-        $log->setAction('Removed the task list ID: '.$id);
+        $log->setAction('Removed the task list ID: ' . $id);
         $log->setIdProject($tasklist->getIdProject());
         $entityManager->persist($log);
 
@@ -267,6 +289,8 @@ class ProjectController extends AbstractController
     }
 
     /**
+     *
+     * Add a tasklist. Used only by Jquery.
      *
      * Matches /project/addTaskList/*
      *
@@ -283,15 +307,16 @@ class ProjectController extends AbstractController
 
         $log = new Log();
         $log->setUser($this->getActiveUser());
-        $log->setAction('Added the task list: '.$name);
+        $log->setAction('Added the task list: ' . $name);
         $log->setIdProject($projectId);
         $entityManager->persist($log);
-
 
         $entityManager->flush();
     }
 
     /**
+     *
+     * Delete a tasklist. Used only by Jquery.
      *
      * Matches /project/delTask/*
      *
@@ -303,13 +328,15 @@ class ProjectController extends AbstractController
         $tasklist = $entityManager->getRepository(TodoTaskList::class)->find($id);
         $log = new Log();
         $log->setUser($this->getActiveUser());
-        $log->setAction('Deleted the task ID: '.$id);
+        $log->setAction('Deleted the task ID: ' . $id);
         $log->setIdProject($tasklist->getIdProject());
         $entityManager->persist($log);
         $entityManager->remove($tasklist);
         $entityManager->flush();
     }
     /**
+     *
+     * Add a task. Used only by Jquery.
      *
      * Matches /project/addTask/*
      *
@@ -326,13 +353,15 @@ class ProjectController extends AbstractController
         $entityManager->persist($task);
         $log = new Log();
         $log->setUser($this->getActiveUser());
-        $log->setAction('Numéro de la liste: '.$taskListId.' . Added the task: '.$val);
+        $log->setAction('Numéro de la liste: ' . $taskListId . ' . Added the task: ' . $val);
         $log->setIdProject($projectId);
         $entityManager->persist($log);
         $entityManager->flush();
     }
 
-     /**
+    /**
+     *
+     * Set a task in "done". Used only by Jquery.
      *
      * Matches /project/isDone/*
      *
@@ -347,14 +376,16 @@ class ProjectController extends AbstractController
 
         $log = new Log();
         $log->setUser($this->getActiveUser());
-        $log->setAction('Done the task ID: '.$id);
+        $log->setAction('Done the task ID: ' . $id);
         $log->setIdProject($task->getIdProject());
         $entityManager->persist($log);
 
         $entityManager->flush();
     }
 
-     /**
+    /**
+     *
+     * Set a task in "notDone". Used only by Jquery.
      *
      * Matches /project/isNotDone/*
      *
@@ -369,7 +400,7 @@ class ProjectController extends AbstractController
 
         $log = new Log();
         $log->setUser($this->getActiveUser());
-        $log->setAction('UnDone the task ID: '.$id);
+        $log->setAction('UnDone the task ID: ' . $id);
         $log->setIdProject($task->getIdProject());
         $entityManager->persist($log);
 
@@ -377,6 +408,8 @@ class ProjectController extends AbstractController
     }
 
     /**
+     *
+     * Return details about a specific project.
      *
      * Matches /project/*
      *
@@ -465,10 +498,14 @@ class ProjectController extends AbstractController
         }
 
         return $this->render('project/indexShow.html.twig', [
-            'controller_name' => 'ProjectController', 'countDoneTask' => $countDoneTask, 'tasksDone' => $tasksDone, 'ArchivedTasklists' => $ArchivedTasklists, 'countArchivedTask' => $countArchivedTask , 'project' => $project, 'tasklists' => $tasklists, 'tasks' => $tasks, 'form' => $form->createView(),
+            'controller_name' => 'ProjectController', 'countDoneTask' => $countDoneTask, 'tasksDone' => $tasksDone, 'ArchivedTasklists' => $ArchivedTasklists, 'countArchivedTask' => $countArchivedTask, 'project' => $project, 'tasklists' => $tasklists, 'tasks' => $tasks, 'form' => $form->createView(),
         ]);
     }
-        /**
+
+    /**
+     *
+     * Create an unique ID. This function is used when we save the project logo file.
+     *
      * @return string
      */
     private function generateUniqueFileName()

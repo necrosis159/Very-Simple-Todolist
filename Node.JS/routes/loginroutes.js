@@ -18,7 +18,7 @@ if(!err) {
 }
 });
 
-//FONCTION LOGIN
+//LOGIN
 exports.login = async function(req,res){
     var email= req.body.email;
     var password = req.body.password;

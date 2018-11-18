@@ -13,7 +13,7 @@ class ProjectLogoType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-        ->add('logo', FileType::class, array('label' => 'Image logo (PNG file 735x271)'))
+            ->add('logo', FileType::class, array('label' => 'Image logo (PNG file 735x271)'))
         ;
     }
 

@@ -7,8 +7,8 @@ var connection = mysql.createConnection({
     database: 'toptasks'
 });
 const jwt = require('jsonwebtoken');
-var bcrypt = require('bcrypt');
-const saltRounds = 13;
+var bcrypt = require('bcrypt'); //Using the same password hashing as Symfony
+const saltRounds = 13; //Same Salt as used on Symfony
 
 //CONNECT BDD
 connection.connect(function (err) {

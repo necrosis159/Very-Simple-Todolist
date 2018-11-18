@@ -2,22 +2,23 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\OutsideAccess;
+use App\Entity\Project;
 use App\Entity\TodoList;
 use App\Entity\TodoTaskList;
-use App\Entity\Project;
 use App\Form\ProjectLogoType;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 class ExternalController extends AbstractController
 {
     /**
-     * 
+     *
+     * Get the list of all external access created
+     *
      * Matches /listExternal/*
-     * 
+     *
      * @Route("/listExternal", name="listExternal")
      */
     public function listExternal()
@@ -36,9 +37,11 @@ class ExternalController extends AbstractController
     }
 
     /**
-     * 
+     *
+     * Route for deleting an external access via Symfony. Used by Jquery only.
+     *
      * Matches /listExternal/delete/*
-     * 
+     *
      * @Route("/listExternal/delete/{id}", name="listExternalDelete")
      */
     public function listExternalDelete($id)
@@ -50,9 +53,11 @@ class ExternalController extends AbstractController
     }
 
     /**
-     * 
+     *
+     * Route for updating who can edit on external access via Symfony. Used by Jquery only.
+     *
      * Matches /listExternal/updateCanEdit/*
-     * 
+     *
      * @Route("/listExternal/updateCanEdit/{id}", name="updateCanEdit")
      */
     public function updateCanEdit($id)
@@ -64,18 +69,19 @@ class ExternalController extends AbstractController
         $entityManager->flush();
     }
 
-
-     /**
-     * 
+    /**
+     *
+     * Route for external people accessing a project if they have an identifier. Here they see the project.
+     *
      * Matches /external/*
-     * 
+     *
      * @Route("/external/{identifier}", name="indexExternal")
      */
     public function indexExternal($identifier, Request $request)
     {
         $entityManager = $this->getDoctrine()->getManager();
         $autorisation = $entityManager->getRepository(\App\Entity\OutsideAccess::class)->findBy(array('identifier' => $identifier));
-        
+
         $canEdit = $autorisation[0]->getCanEdit();
         $idProject = $autorisation[0]->getIdProject();
         $name = $autorisation[0]->getName();
@@ -161,11 +167,13 @@ class ExternalController extends AbstractController
         }
 
         return $this->render('external/indexShow.html.twig', [
-            'canEdit' => $canEdit, 'controller_name' => 'ProjectController', 'countDoneTask' => $countDoneTask, 'tasksDone' => $tasksDone, 'ArchivedTasklists' => $ArchivedTasklists, 'countArchivedTask' => $countArchivedTask , 'project' => $project, 'tasklists' => $tasklists, 'tasks' => $tasks, 'form' => $form->createView(),
+            'canEdit' => $canEdit, 'controller_name' => 'ProjectController', 'countDoneTask' => $countDoneTask, 'tasksDone' => $tasksDone, 'ArchivedTasklists' => $ArchivedTasklists, 'countArchivedTask' => $countArchivedTask, 'project' => $project, 'tasklists' => $tasklists, 'tasks' => $tasks, 'form' => $form->createView(),
         ]);
     }
 
     /**
+     *
+     * Route for external people accessing a project if they have an identifier. Here they archive a tasklist. Only used by Jquery.
      *
      * Matches /external/archiveTaskList/*
      *
@@ -181,21 +189,25 @@ class ExternalController extends AbstractController
     }
 
     /**
-    *
-    * Matches /external/isNotDone/*
-    *
-    * @Route("/external/isNotDone/{projectId}", name="isNotDoneExternal")
-    */
-   public function isNotDoneExternal($projectId)
-   {
-       $entityManager = $this->getDoctrine()->getManager();
-       $tasklist = $entityManager->getRepository(TodoTaskList::class)->find($id);
-       $task->setIsDone(0);
-       $entityManager->persist($task);
-       $entityManager->flush();
-   }
-   
-   /**
+     *
+     * Route for external people accessing a project if they have an identifier. Here they say that a task isn't done . Only used by Jquery.
+     *
+     * Matches /external/isNotDone/*
+     *
+     * @Route("/external/isNotDone/{projectId}", name="isNotDoneExternal")
+     */
+    public function isNotDoneExternal($projectId)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $tasklist = $entityManager->getRepository(TodoTaskList::class)->find($id);
+        $task->setIsDone(0);
+        $entityManager->persist($task);
+        $entityManager->flush();
+    }
+
+    /**
+     *
+     * Route for external people accessing a project if they have an identifier. Here they say that a task is done. Only used by Jquery.
      *
      * Matches /external/isDone/*
      *
@@ -212,6 +224,8 @@ class ExternalController extends AbstractController
 
     /**
      *
+     * Route for external people accessing a project if they have an identifier. Here they restore a tasklist. Only used by Jquery.
+     *
      * Matches /external/restoreTaskList/*
      *
      * @Route("/external/restoreTaskList/{id}", name="restoreTaskListExternal")
@@ -226,69 +240,80 @@ class ExternalController extends AbstractController
     }
 
     /**
-    * @Route("/external/updateTask/{id}/{name}", name="updateTaskExternal")
-    */
-   public function updateTaskExternal($id, $name)
-   {
-       $entityManager = $this->getDoctrine()->getManager();
-       $project = $entityManager->getRepository(TodoTaskList::class)->find($id);
-       
-       if (!$project) {
-           throw $this->createNotFoundException(
-               'No product found for id '.$id
-           );
-       }
+     *
+     * Route for external people accessing a project if they have an identifier. Here they update a task name. Only used by Jquery.
 
-       $project->setName($name);
-       $entityManager->flush();
-   }
+     * @Route("/external/updateTask/{id}/{name}", name="updateTaskExternal")
+     */
+    public function updateTaskExternal($id, $name)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $project = $entityManager->getRepository(TodoTaskList::class)->find($id);
 
-   /**
-    *
-    * Matches /external/delTaskList/*
-    *
-    * @Route("/external/delTaskList/{id}", name="delTaskListExternal")
-    */
-   public function delTaskListExternal($id)
-   {
-       $entityManager = $this->getDoctrine()->getManager();
-       $tasklist = $entityManager->getRepository(TodoList::class)->find($id);
-       $entityManager->remove($tasklist);
-       $entityManager->flush();
-   }
+        if (!$project) {
+            throw $this->createNotFoundException(
+                'No product found for id ' . $id
+            );
+        }
 
-   /**
-    *
-    * Matches /external/delTask/*
-    *
-    * @Route("/external/delTask/{id}", name="delTaskExternal")
-    */
-   public function delTaskExternal($id)
-   {
-       $entityManager = $this->getDoctrine()->getManager();
-       $tasklist = $entityManager->getRepository(TodoTaskList::class)->find($id);
-       $entityManager->remove($tasklist);
-       $entityManager->flush();
-   }
+        $project->setName($name);
+        $entityManager->flush();
+    }
 
-   /**
-    *
-    * Matches /external/addTaskList/*
-    *
-    * @Route("/external/addTaskList/{projectId}/{name}", name="addTaskListExternal")
-    */
-   public function addTaskListExternal($projectId, $name)
-   {
-       $entityManager = $this->getDoctrine()->getManager();
-       $tasklist = new TodoList();
-       $tasklist->setName($name);
-       $tasklist->setIdProject($projectId);
-       $tasklist->setIsArchived(0);
-       $entityManager->persist($tasklist);
-       $entityManager->flush();
-   }
-   
     /**
+     *
+     * Route for external people accessing a project if they have an identifier. Here they delete a task list. Only used by Jquery.
+     *
+     * Matches /external/delTaskList/*
+     *
+     * @Route("/external/delTaskList/{id}", name="delTaskListExternal")
+     */
+    public function delTaskListExternal($id)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $tasklist = $entityManager->getRepository(TodoList::class)->find($id);
+        $entityManager->remove($tasklist);
+        $entityManager->flush();
+    }
+
+    /**
+     *
+     * Route for external people accessing a project if they have an identifier. Here they delete a task. Only used by Jquery.
+     *
+     * Matches /external/delTask/*
+     *
+     * @Route("/external/delTask/{id}", name="delTaskExternal")
+     */
+    public function delTaskExternal($id)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $tasklist = $entityManager->getRepository(TodoTaskList::class)->find($id);
+        $entityManager->remove($tasklist);
+        $entityManager->flush();
+    }
+
+    /**
+     *
+     * Route for external people accessing a project if they have an identifier. Here they add a tasklist. Only used by Jquery.
+     *
+     * Matches /external/addTaskList/*
+     *
+     * @Route("/external/addTaskList/{projectId}/{name}", name="addTaskListExternal")
+     */
+    public function addTaskListExternal($projectId, $name)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $tasklist = new TodoList();
+        $tasklist->setName($name);
+        $tasklist->setIdProject($projectId);
+        $tasklist->setIsArchived(0);
+        $entityManager->persist($tasklist);
+        $entityManager->flush();
+    }
+
+    /**
+     *
+     * Route for external people accessing a project if they have an identifier. Here they add a task. Only used by Jquery.
      *
      * Matches /external/addTask/*
      *
@@ -307,20 +332,23 @@ class ExternalController extends AbstractController
     }
 
     /**
-    * @Route("/external/update/{id}/{name}", name="projectupdateExternal")
-    */
-   public function projectupdateExternal($id, $name)
-   {
-       $entityManager = $this->getDoctrine()->getManager();
-       $project = $entityManager->getRepository(Project::class)->find($id);
+     *
+     * Route for external people accessing a project if they have an identifier. Here they update a task. Only used by Jquery.
+     *
+     * @Route("/external/update/{id}/{name}", name="projectupdateExternal")
+     */
+    public function projectupdateExternal($id, $name)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $project = $entityManager->getRepository(Project::class)->find($id);
 
-       if (!$project) {
-           throw $this->createNotFoundException(
-               'No product found for id '.$id
-           );
-       }
+        if (!$project) {
+            throw $this->createNotFoundException(
+                'No product found for id ' . $id
+            );
+        }
 
-       $project->setName($name);
-       $entityManager->flush();
-   }
+        $project->setName($name);
+        $entityManager->flush();
+    }
 }

@@ -8,11 +8,14 @@ use Symfony\Component\Routing\Annotation\Route;
 class IndexController extends AbstractController
 {
     /**
+     *
+     * Default function
+     *
      * @Route("/", name="index")
      */
     public function index()
     {
-        $usr= $this->get('security.token_storage')->getToken()->getUser();
+        $usr = $this->get('security.token_storage')->getToken()->getUser();
         setcookie("UserLastName", $usr->getUsername());
 
         return $this->render('index/index.html.twig', [

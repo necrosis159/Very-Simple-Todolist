@@ -2,13 +2,16 @@
 
 namespace App\Controller;
 
+use App\Entity\Log;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Entity\Log;
 
 class LogController extends AbstractController
 {
     /**
+     *
+     * Return all the logs in the database
+     *
      * @Route("/log", name="log")
      */
     public function index()
