@@ -6,6 +6,7 @@ use App\Entity\TodoList;
 use App\Entity\TodoTaskList;
 use App\Entity\Project;
 use App\Entity\OutsideAccess;
+use App\Entity\Log;
 use App\Form\ProjectLogoType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,6 +15,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ProjectController extends AbstractController
 {
+    /**
+     * @return string
+     */
+    private function getActiveUser(){
+        $usr= $this->get('security.token_storage')->getToken()->getUser();
+        return $usr->getUsername();
+    }
      /**
      * 
      *  Matches /project/outsideAccess/*
@@ -28,6 +36,14 @@ class ProjectController extends AbstractController
         $OutsideAccess->setCanEdit($canEdit);
         $OutsideAccess->setIdProject($projectId);
         $entityManager->persist($OutsideAccess);
+
+        $log = new Log();
+        $log->setUser($this->getActiveUser());
+        $log->setAction('Opened external access');
+        $log->setIdProject($projectId);
+        $entityManager->persist($log);
+
+
         $entityManager->flush();
     }
 
@@ -60,7 +76,55 @@ class ProjectController extends AbstractController
         $tasklist = $entityManager->getRepository(TodoList::class)->find($id);
         $tasklist->setIsArchived(1);
         $entityManager->persist($tasklist);
+
+        $log = new Log();
+        $log->setUser($this->getActiveUser());
+        $log->setAction('Archived the tasklist: '.$id);
+        $log->setIdProject($tasklist->getIdProject());
+        $entityManager->persist($log);
+
         $entityManager->flush();
+    }
+
+    /**
+     *
+     * Matches /project/isListDone/*
+     *
+     * @Route("/project/isListDone/{id}", name="isListDone")
+     */
+    public function isListDone($id)
+    {
+        $dm = $this->getDoctrine()->getManager();
+        $qb = $dm->createQueryBuilder();
+        $qb->select('u.id, u.isDone, u.idList')
+            ->from('\App\Entity\TodoTaskList', 'u')
+            ->where('u.idList = ?1')
+            ->setParameter(1, $id);
+        $query = $qb->getQuery();
+        $tasklists = $query->getScalarResult();
+        $isEverythingDone = 0;
+        $numberOfTaskDone = 0;
+        $numberOfLoops = 0;
+        foreach ($tasklists as $task) {
+            $numberOfLoops++;
+            if($task['isDone'] == 1){
+                $numberOfTaskDone++;
+            }
+        }
+        if($numberOfLoops == $numberOfTaskDone){
+            $tasklist = $this->getDoctrine()
+            ->getRepository(TodoList::class)
+            ->find($id);
+            $tasklist->setIsArchived(1);
+
+            $log = new Log();
+            $log->setUser($this->getActiveUser());
+            $log->setAction('Automatically archived the tasklist: '.$id);
+            $log->setIdProject(null);
+            $dm->persist($log);
+
+            $dm->flush();
+        }
     }
 
     /**
@@ -75,6 +139,13 @@ class ProjectController extends AbstractController
         $tasklist = $entityManager->getRepository(TodoList::class)->find($id);
         $tasklist->setIsArchived(0);
         $entityManager->persist($tasklist);
+
+        $log = new Log();
+        $log->setUser($this->getActiveUser());
+        $log->setAction('Restored a tasklist: '.$id);
+        $log->setIdProject($tasklist->getIdProject());
+        $entityManager->persist($log);
+
         $entityManager->flush();
     }
 
@@ -87,6 +158,14 @@ class ProjectController extends AbstractController
         $project = new Project();
         $project->setName($name);
         $entityManager->persist($project);
+
+        $log = new Log();
+        $log->setUser($this->getActiveUser());
+        $log->setAction('Created a new projet: '.$name);
+        $log->setIdProject(null);
+        $entityManager->persist($log);
+
+
         $entityManager->flush();
     }
 
@@ -105,6 +184,14 @@ class ProjectController extends AbstractController
         }
 
         $project->setName($name);
+
+        $log = new Log();
+        $log->setUser($this->getActiveUser());
+        $log->setAction('Updated the project with a new name: '.$name);
+        $log->setIdProject($id);
+        $entityManager->persist($log);
+
+
         $entityManager->flush();
     }
 
@@ -123,6 +210,13 @@ class ProjectController extends AbstractController
         }
 
         $project->setName($name);
+
+        $log = new Log();
+        $log->setUser($this->getActiveUser());
+        $log->setAction('Updated the task: '.$id.'. New Name: '.$name);
+        $log->setIdProject($project->getIdProject());
+        $entityManager->persist($log);
+
         $entityManager->flush();
     }
 
@@ -141,6 +235,13 @@ class ProjectController extends AbstractController
         }
 
         $project->setName($name);
+
+        $log = new Log();
+        $log->setUser($this->getActiveUser());
+        $log->setAction('Updated the task list: '.$id.'. New Name: '.$name);
+        $log->setIdProject($project->getIdProject());
+        $entityManager->persist($log);
+
         $entityManager->flush();
     }
 
@@ -154,6 +255,13 @@ class ProjectController extends AbstractController
     {
         $entityManager = $this->getDoctrine()->getManager();
         $tasklist = $entityManager->getRepository(TodoList::class)->find($id);
+
+        $log = new Log();
+        $log->setUser($this->getActiveUser());
+        $log->setAction('Removed the task list ID: '.$id);
+        $log->setIdProject($tasklist->getIdProject());
+        $entityManager->persist($log);
+
         $entityManager->remove($tasklist);
         $entityManager->flush();
     }
@@ -172,6 +280,14 @@ class ProjectController extends AbstractController
         $tasklist->setIdProject($projectId);
         $tasklist->setIsArchived(0);
         $entityManager->persist($tasklist);
+
+        $log = new Log();
+        $log->setUser($this->getActiveUser());
+        $log->setAction('Added the task list: '.$name);
+        $log->setIdProject($projectId);
+        $entityManager->persist($log);
+
+
         $entityManager->flush();
     }
 
@@ -185,6 +301,11 @@ class ProjectController extends AbstractController
     {
         $entityManager = $this->getDoctrine()->getManager();
         $tasklist = $entityManager->getRepository(TodoTaskList::class)->find($id);
+        $log = new Log();
+        $log->setUser($this->getActiveUser());
+        $log->setAction('Deleted the task ID: '.$id);
+        $log->setIdProject($tasklist->getIdProject());
+        $entityManager->persist($log);
         $entityManager->remove($tasklist);
         $entityManager->flush();
     }
@@ -203,6 +324,11 @@ class ProjectController extends AbstractController
         $task->setIdList($taskListId);
         $task->setIsDone(0);
         $entityManager->persist($task);
+        $log = new Log();
+        $log->setUser($this->getActiveUser());
+        $log->setAction('Numéro de la liste: '.$taskListId.' . Added the task: '.$val);
+        $log->setIdProject($projectId);
+        $entityManager->persist($log);
         $entityManager->flush();
     }
 
@@ -210,14 +336,21 @@ class ProjectController extends AbstractController
      *
      * Matches /project/isDone/*
      *
-     * @Route("/project/isDone/{projectId}", name="isDone")
+     * @Route("/project/isDone/{id}", name="isDone")
      */
-    public function isDone($projectId)
+    public function isDone($id)
     {
         $entityManager = $this->getDoctrine()->getManager();
-        $tasklist = $entityManager->getRepository(TodoTaskList::class)->find($id);
+        $task = $entityManager->getRepository(TodoTaskList::class)->find($id);
         $task->setIsDone(1);
         $entityManager->persist($task);
+
+        $log = new Log();
+        $log->setUser($this->getActiveUser());
+        $log->setAction('Done the task ID: '.$id);
+        $log->setIdProject($task->getIdProject());
+        $entityManager->persist($log);
+
         $entityManager->flush();
     }
 
@@ -225,14 +358,21 @@ class ProjectController extends AbstractController
      *
      * Matches /project/isNotDone/*
      *
-     * @Route("/project/isNotDone/{projectId}", name="isNotDone")
+     * @Route("/project/isNotDone/{id}", name="isNotDone")
      */
-    public function isNotDone($projectId)
+    public function isNotDone($id)
     {
         $entityManager = $this->getDoctrine()->getManager();
-        $tasklist = $entityManager->getRepository(TodoTaskList::class)->find($id);
+        $task = $entityManager->getRepository(TodoTaskList::class)->find($id);
         $task->setIsDone(0);
         $entityManager->persist($task);
+
+        $log = new Log();
+        $log->setUser($this->getActiveUser());
+        $log->setAction('UnDone the task ID: '.$id);
+        $log->setIdProject($task->getIdProject());
+        $entityManager->persist($log);
+
         $entityManager->flush();
     }
 

@@ -431,14 +431,16 @@
     </div>
     <div><img style="display: block;margin-top:10px;margin-left: auto;margin-right: auto;"src="/img/logo.png" width="210"></div>
     <h1>{{project.name}}
-        
-        <span style="display:none;" id='btn-projet' class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+        {% if canEdit == 1 %}
+        <span id='btn-projet' class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+        {% endif %}
     </h1>
     <div style="text-align:center;">Vous avez {{countDoneTask}} tâche(s) effectuée(s) sur ce projet!</div>
     <br>
     {% for tasklist in tasklists %}
     <div class="tasklist" id="tasklist-{{tasklist.id}}" style="position:relative; width: 200px; min-height: 200px; background:white; radius:10px; padding: 10px; margin: 0 10px 0 10px;float:left;">
-        <div class="option" style="display:none;position:absolute; right: 10px;">
+        {% if canEdit == 1 %}
+        <div class="option" style="position:absolute; right: 10px;">
             <a href="#" onClick="archiveTaskList({{tasklist.id}})">
             <span><img height='14' src="/img/archive.png"></span>
             </a>
@@ -446,6 +448,7 @@
             <span style="color:red;" class="glyphicon glyphicon-trash" aria-hidden="true"></span>
             </a>
         </div>
+        {% endif %}
         <center>
             <h4>{{tasklist.name}}</h4>
             <hr>
@@ -454,7 +457,8 @@
         {% if task.idList == tasklist.id %}
         <div style="position:relative; background-color:grey; padding: 10px; color:white; margin-bottom: 10px;">
             {{task.name}}
-            <div class="option" style="display:none;position:absolute; right: 10px; top:12px;">
+            {% if canEdit == 1 %}
+            <div class="option" style="position:absolute; right: 10px; top:12px;">
                 <a href="#" onClick="itsdone({{task.id}})"><span style="color:#86d62f;" class="glyphicon glyphicon-ok" aria-hidden="true"></span></a>
                 <a href="#" onclick='updateModal({{task.id}},"{{task.name|e('js')}}")'>
                 <span style="color:	#BC8F8F;" class="btn-update-task glyphicon glyphicon-pencil" aria-hidden="true"></span>
@@ -462,10 +466,13 @@
                 <a href="#" onclick="delTask({{task.id}});">
                 <span style="color:red;" class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
             </div>
+            {% endif %}
         </div>
         {% endif %}
         {% endfor %}
-        <div style="display:none;background-color:grey; padding: 10px; color:white; margin-bottom: 10px;"><input id="addTask-{{tasklist.id}}" data="{{tasklist.id}}" placeholder="Ajouter une tâche..."></div>
+        {% if canEdit == 1 %}
+        <div style="background-color:grey; padding: 10px; color:white; margin-bottom: 10px;"><input id="addTask-{{tasklist.id}}" data="{{tasklist.id}}" placeholder="Ajouter une tâche..."></div>
+        {% endif %}
         <div class="menuslide" id="slider">
             <a href="#" class="selector">Voir les tâches effectuées<span class="glyphicon glyphicon-chevron-down" style="color:white; margin-left:5px;" aria-hidden="true"></span></a>
             <ul style="display: none;">
@@ -484,36 +491,38 @@
         {% endif %}
     </div>
     {% endfor %}
-    <div id="addTL" style="display:none; width: 200px; background:white; radius:10px; padding: 10px; margin: 0 10px 0 10px;float:left;">
+    {% if canEdit == 1 %}
+    <div id="addTL" style="width: 200px; background:white; radius:10px; padding: 10px; margin: 0 10px 0 10px;float:left;">
         <input id="addTaskList" placeholder="Ajouter une liste...">
     </div>
-    <span style="display:none;"onclick="slideDatTing()">open</span>
-    <button style="display:none;" id="btn-update-open">
+    
+    <span style=""onclick="slideDatTing()">open</span>
+    <button style="" id="btn-update-open">{% endif %}
     <script>
         function archiveTaskList(id){
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/project/archiveTaskList/" + id, true);
+            xhttp.open("GET", "/external/archiveTaskList/" + id, true);
             xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
         }
         
         function restoreTask(id){
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/project/isNotDone/" + id, true);
+            xhttp.open("GET", "/external/isNotDone/" + id, true);
             xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
         }
         
         function itsdone(id){
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/project/isDone/" + id, true);
+            xhttp.open("GET", "/external/isDone/" + id, true);
             xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
         }
         
         function restoreTaskList(id){
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/project/restoreTaskList/" + id, true);
+            xhttp.open("GET", "/external/restoreTaskList/" + id, true);
             xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
         }
@@ -528,21 +537,21 @@
             var name = $('#task-update-input').val();
             var id = $('#task-update-id').val();
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/project/updateTask/" + id + "/" + name, true);
+            xhttp.open("GET", "/external/updateTask/" + id + "/" + name, true);
             xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
         }
         
         function delList(id) {
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/project/delTaskList/" + id, true);
+            xhttp.open("GET", "/external/delTaskList/" + id, true);
             xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
         }
         
         function delTask(id) {
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/project/delTask/" + id, true);
+            xhttp.open("GET", "/external/delTask/" + id, true);
             xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
         }
@@ -551,7 +560,7 @@
             if (event.keyCode == 13 || event.which == 13) {
                 var val = $('#addTaskList').val();
                 var xhttp = new XMLHttpRequest();
-                xhttp.open("GET", "/project/addTaskList/" + {{project.id}} + "/" + val, true);
+                xhttp.open("GET", "/external/addTaskList/" + {{project.id}} + "/" + val, true);
                 xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
             }
@@ -563,7 +572,7 @@
                 var val = $('#' + document.activeElement.id).val();
                 var taskListId = $('#' + document.activeElement.id).attr('data');
                 var xhttp = new XMLHttpRequest();
-                xhttp.open("GET", "/project/addTask/" + {{project.id}} + "/" + taskListId + "/" + val, true);
+                xhttp.open("GET", "/external/addTask/" + {{project.id}} + "/" + taskListId + "/" + val, true);
                 xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
             }
@@ -605,7 +614,7 @@
         function projectUpdate(id) {
             var name = $('#project-update-input').val();
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/project/update/" + id + "/" + name, true);
+            xhttp.open("GET", "/external/update/" + id + "/" + name, true);
             xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
         }

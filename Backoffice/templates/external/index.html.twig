@@ -15,7 +15,7 @@
     </style>
 
     <div class="listExternal">
-        <h1>Liste des accès externe</h1><br><div style="text-align:center;">Mise à jour "Peut Editer" - Coming Soon</div>
+        <h1>Liste des accès externe</h1><br><div style="text-align:center;">Pour ouvrir un accès externe à un projet, aller au projet puis cliquer sur : <a href="/project/" target="_BLANK"><span class="glyphicon glyphicon-share" aria-hidden="true"></span></a></div>
         <table id="table_id" class="display">
             <thead>
                 <tr>
@@ -29,7 +29,7 @@
                 {% for item in OutsideAccess %}
                 <tr>
                     <td>{{item.name}}</td>
-                    <td>{% if item.canEdit == 1 %}Oui{% else %}Non{% endif %}</td>
+                    <td>{% if item.canEdit == 1 %}Oui{% else %}Non{% endif %} <span onClick='canEdit({{item.id}})' class="glyphicon glyphicon-refresh" aria-hidden="true"></span></td>
                     <td><a href="/external/{{item.identifier}}" target="_BLANK">/external/{{item.identifier}} <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span></a></td>
                     <td><span class="glyphicon glyphicon-trash" style="color:red; cursor:pointer;" onClick="delAccess({{item.id}})" aria-hidden="true"></span></td>
                 </tr>
@@ -44,6 +44,13 @@
         function delAccess(id){
             var xhttp = new XMLHttpRequest();
             xhttp.open("GET", "/listExternal/delete/" + id, true);
+            xhttp.send();
+            setTimeout(function(){ location.reload() }, 500);
+        }
+        
+        function canEdit(id){
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "/listExternal/updateCanEdit/" + id, true);
             xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
         }

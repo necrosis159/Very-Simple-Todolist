@@ -48,6 +48,23 @@ class ExternalController extends AbstractController
         $entityManager->remove($OutsideAccess);
         $entityManager->flush();
     }
+
+    /**
+     * 
+     * Matches /listExternal/updateCanEdit/*
+     * 
+     * @Route("/listExternal/updateCanEdit/{id}", name="updateCanEdit")
+     */
+    public function updateCanEdit($id)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $OutsideAccess = $entityManager->getRepository(OutsideAccess::class)->find($id);
+        $canEdit = $OutsideAccess->getCanEdit();
+        $OutsideAccess->setCanEdit(!$canEdit);
+        $entityManager->flush();
+    }
+
+
      /**
      * 
      * Matches /external/*
@@ -144,7 +161,166 @@ class ExternalController extends AbstractController
         }
 
         return $this->render('external/indexShow.html.twig', [
-            'controller_name' => 'ProjectController', 'countDoneTask' => $countDoneTask, 'tasksDone' => $tasksDone, 'ArchivedTasklists' => $ArchivedTasklists, 'countArchivedTask' => $countArchivedTask , 'project' => $project, 'tasklists' => $tasklists, 'tasks' => $tasks, 'form' => $form->createView(),
+            'canEdit' => $canEdit, 'controller_name' => 'ProjectController', 'countDoneTask' => $countDoneTask, 'tasksDone' => $tasksDone, 'ArchivedTasklists' => $ArchivedTasklists, 'countArchivedTask' => $countArchivedTask , 'project' => $project, 'tasklists' => $tasklists, 'tasks' => $tasks, 'form' => $form->createView(),
         ]);
     }
+
+    /**
+     *
+     * Matches /external/archiveTaskList/*
+     *
+     * @Route("/external/archiveTaskList/{id}", name="archiveTaskListExternal")
+     */
+    public function archiveTaskListExternal($id)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $tasklist = $entityManager->getRepository(TodoList::class)->find($id);
+        $tasklist->setIsArchived(1);
+        $entityManager->persist($tasklist);
+        $entityManager->flush();
+    }
+
+    /**
+    *
+    * Matches /external/isNotDone/*
+    *
+    * @Route("/external/isNotDone/{projectId}", name="isNotDoneExternal")
+    */
+   public function isNotDoneExternal($projectId)
+   {
+       $entityManager = $this->getDoctrine()->getManager();
+       $tasklist = $entityManager->getRepository(TodoTaskList::class)->find($id);
+       $task->setIsDone(0);
+       $entityManager->persist($task);
+       $entityManager->flush();
+   }
+   
+   /**
+     *
+     * Matches /external/isDone/*
+     *
+     * @Route("/external/isDone/{id}", name="isDoneExternal")
+     */
+    public function isDoneExternal($id)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $task = $entityManager->getRepository(TodoTaskList::class)->find($id);
+        $task->setIsDone(1);
+        $entityManager->persist($task);
+        $entityManager->flush();
+    }
+
+    /**
+     *
+     * Matches /external/restoreTaskList/*
+     *
+     * @Route("/external/restoreTaskList/{id}", name="restoreTaskListExternal")
+     */
+    public function restoreTaskListExternal($id)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $tasklist = $entityManager->getRepository(TodoList::class)->find($id);
+        $tasklist->setIsArchived(0);
+        $entityManager->persist($tasklist);
+        $entityManager->flush();
+    }
+
+    /**
+    * @Route("/external/updateTask/{id}/{name}", name="updateTaskExternal")
+    */
+   public function updateTaskExternal($id, $name)
+   {
+       $entityManager = $this->getDoctrine()->getManager();
+       $project = $entityManager->getRepository(TodoTaskList::class)->find($id);
+       
+       if (!$project) {
+           throw $this->createNotFoundException(
+               'No product found for id '.$id
+           );
+       }
+
+       $project->setName($name);
+       $entityManager->flush();
+   }
+
+   /**
+    *
+    * Matches /external/delTaskList/*
+    *
+    * @Route("/external/delTaskList/{id}", name="delTaskListExternal")
+    */
+   public function delTaskListExternal($id)
+   {
+       $entityManager = $this->getDoctrine()->getManager();
+       $tasklist = $entityManager->getRepository(TodoList::class)->find($id);
+       $entityManager->remove($tasklist);
+       $entityManager->flush();
+   }
+
+   /**
+    *
+    * Matches /external/delTask/*
+    *
+    * @Route("/external/delTask/{id}", name="delTaskExternal")
+    */
+   public function delTaskExternal($id)
+   {
+       $entityManager = $this->getDoctrine()->getManager();
+       $tasklist = $entityManager->getRepository(TodoTaskList::class)->find($id);
+       $entityManager->remove($tasklist);
+       $entityManager->flush();
+   }
+
+   /**
+    *
+    * Matches /external/addTaskList/*
+    *
+    * @Route("/external/addTaskList/{projectId}/{name}", name="addTaskListExternal")
+    */
+   public function addTaskListExternal($projectId, $name)
+   {
+       $entityManager = $this->getDoctrine()->getManager();
+       $tasklist = new TodoList();
+       $tasklist->setName($name);
+       $tasklist->setIdProject($projectId);
+       $tasklist->setIsArchived(0);
+       $entityManager->persist($tasklist);
+       $entityManager->flush();
+   }
+   
+    /**
+     *
+     * Matches /external/addTask/*
+     *
+     * @Route("/external/addTask/{projectId}/{taskListId}/{val}", name="addTaskExternal")
+     */
+    public function addTaskExternal($projectId, $taskListId, $val)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $task = new TodoTaskList();
+        $task->setName($val);
+        $task->setIdProject($projectId);
+        $task->setIdList($taskListId);
+        $task->setIsDone(0);
+        $entityManager->persist($task);
+        $entityManager->flush();
+    }
+
+    /**
+    * @Route("/external/update/{id}/{name}", name="projectupdateExternal")
+    */
+   public function projectupdateExternal($id, $name)
+   {
+       $entityManager = $this->getDoctrine()->getManager();
+       $project = $entityManager->getRepository(Project::class)->find($id);
+
+       if (!$project) {
+           throw $this->createNotFoundException(
+               'No product found for id '.$id
+           );
+       }
+
+       $project->setName($name);
+       $entityManager->flush();
+   }
 }

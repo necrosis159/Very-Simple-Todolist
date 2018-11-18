@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello
+    {{ controller_name }}!{% endblock %}
+
+{% block body %}
+
+    <style>
+        .logs {
+            margin: 1em auto;
+            max-width: calc(100% - 230px);
+            width: 95%;
+            font: 18px/1.5 sans-serif;
+        }
+    </style>
+
+    <div class="logs">
+        <h1>Liste des accès externe</h1>
+        <table id="table_id" class="display">
+            <thead>
+                <tr>
+                    <th>Utilisateur</th>
+                    <th>Id du projet</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in logs %}
+                <tr>
+                    <td>{{item.user}}</td>
+                    <td>{{item.idProject}}</td>
+                    <td>{{item.action}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $('#table_id').DataTable();
+        });
+    </script>
+{% endblock %}

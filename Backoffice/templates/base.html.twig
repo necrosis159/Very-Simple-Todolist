@@ -134,11 +134,11 @@
             <div class="clearfix"></div>
             <div class="profile clearfix">
                 <div class="profile_pic">
-                    <img src="/avatar/mathias.png" alt="..." class="img-circle profile_img">
+                    <img src="/avatar/defaultUser.svg" alt="..." class="img-circle profile_img">
                 </div>
                 <div class="profile_info">
                     <span>Bienvenue,</span>
-                    <h2>Mathias-Rui Lopes</h2>
+                    <h2 id="profile_username">User</h2>
                 </div>
             </div>
             <br>
@@ -166,6 +166,13 @@
                                 ACCES EXTERNE</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/log">
+                            <i class="fa fa-dashboard fa-sm"></i>
+                            <span class="menu-titre">
+                                LOGS</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
             <div class="sidebar-footer hidden-small">
@@ -189,13 +196,31 @@
         </div>
         {% block javascripts %}{% endblock %}
         <script>
-        function logoff() {
-            var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/logoff/", true);
-            xhttp.send();
-            //location.reload();
-            setTimeout(function(){ location.reload() }, 500);
-        }
+            function logoff() {
+                var xhttp = new XMLHttpRequest();
+                xhttp.open("GET", "/logoff/", true);
+                xhttp.send();
+                //location.reload();
+                setTimeout(function () {
+                    location.reload()
+                }, 500);
+            }
+            function getCookie(cname) {
+                var name = cname + "=";
+                var decodedCookie = decodeURIComponent(document.cookie);
+                var ca = decodedCookie.split(';');
+                for (var i = 0; i < ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) == ' ') {
+                        c = c.substring(1);
+                    }
+                    if (c.indexOf(name) == 0) {
+                        return c.substring(name.length, c.length);
+                    }
+                }
+                return "";
+            }
+            $('#profile_username').html(getCookie("UserLastName"))
         </script>
     </body>
 </html>
