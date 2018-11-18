@@ -496,33 +496,33 @@
         <input id="addTaskList" placeholder="Ajouter une liste...">
     </div>
     
-    <span style=""onclick="slideDatTing()">open</span>
+    <span style="" onclick="slideDatTing()">open</span>
     <button style="" id="btn-update-open">{% endif %}
     <script>
         function archiveTaskList(id){
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/external/archiveTaskList/" + id, true);
+            xhttp.open("GET", "/external/archiveTaskList/{{ identifier }}/" + id, true);
             xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
         }
         
         function restoreTask(id){
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/external/isNotDone/" + id, true);
+            xhttp.open("GET", "/external/isNotDone/{{ identifier }}/" + id, true);
             xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
         }
         
         function itsdone(id){
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/external/isDone/" + id, true);
+            xhttp.open("GET", "/external/isDone/{{ identifier }}/" + id, true);
             xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
         }
         
         function restoreTaskList(id){
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/external/restoreTaskList/" + id, true);
+            xhttp.open("GET", "/external/restoreTaskList/{{ identifier }}/" + id, true);
             xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
         }
@@ -537,21 +537,21 @@
             var name = $('#task-update-input').val();
             var id = $('#task-update-id').val();
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/external/updateTask/" + id + "/" + name, true);
+            xhttp.open("GET", "/external/updateTask/{{ identifier }}/" + id + "/" + name, true);
             xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
         }
         
         function delList(id) {
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/external/delTaskList/" + id, true);
+            xhttp.open("GET", "/external/delTaskList/{{ identifier }}/" + id, true);
             xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
         }
         
         function delTask(id) {
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/external/delTask/" + id, true);
+            xhttp.open("GET", "/external/delTask/{{ identifier }}/" + id, true);
             xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
         }
@@ -560,7 +560,7 @@
             if (event.keyCode == 13 || event.which == 13) {
                 var val = $('#addTaskList').val();
                 var xhttp = new XMLHttpRequest();
-                xhttp.open("GET", "/external/addTaskList/" + {{project.id}} + "/" + val, true);
+                xhttp.open("GET", "/external/addTaskList/{{ identifier }}/" + {{project.id}} + "/" + val, true);
                 xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
             }
@@ -572,7 +572,7 @@
                 var val = $('#' + document.activeElement.id).val();
                 var taskListId = $('#' + document.activeElement.id).attr('data');
                 var xhttp = new XMLHttpRequest();
-                xhttp.open("GET", "/external/addTask/" + {{project.id}} + "/" + taskListId + "/" + val, true);
+                xhttp.open("GET", "/external/addTask/{{ identifier }}/" + {{project.id}} + "/" + taskListId + "/" + val, true);
                 xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
             }
@@ -614,7 +614,7 @@
         function projectUpdate(id) {
             var name = $('#project-update-input').val();
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/external/update/" + id + "/" + name, true);
+            xhttp.open("GET", "/external/update/{{ identifier }}/" + id + "/" + name, true);
             xhttp.send();
             setTimeout(function(){ location.reload() }, 500);
         }

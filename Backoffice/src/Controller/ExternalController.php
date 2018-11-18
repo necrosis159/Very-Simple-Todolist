@@ -6,8 +6,12 @@ use App\Entity\OutsideAccess;
 use App\Entity\Project;
 use App\Entity\TodoList;
 use App\Entity\TodoTaskList;
+use App\Entity\Log;
+
 use App\Form\ProjectLogoType;
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -167,7 +171,7 @@ class ExternalController extends AbstractController
         }
 
         return $this->render('external/indexShow.html.twig', [
-            'canEdit' => $canEdit, 'controller_name' => 'ProjectController', 'countDoneTask' => $countDoneTask, 'tasksDone' => $tasksDone, 'ArchivedTasklists' => $ArchivedTasklists, 'countArchivedTask' => $countArchivedTask, 'project' => $project, 'tasklists' => $tasklists, 'tasks' => $tasks, 'form' => $form->createView(),
+            'identifier' => $identifier, 'canEdit' => $canEdit, 'controller_name' => 'ProjectController', 'countDoneTask' => $countDoneTask, 'tasksDone' => $tasksDone, 'ArchivedTasklists' => $ArchivedTasklists, 'countArchivedTask' => $countArchivedTask, 'project' => $project, 'tasklists' => $tasklists, 'tasks' => $tasks, 'form' => $form->createView(),
         ]);
     }
 
@@ -177,14 +181,30 @@ class ExternalController extends AbstractController
      *
      * Matches /external/archiveTaskList/*
      *
-     * @Route("/external/archiveTaskList/{id}", name="archiveTaskListExternal")
+     * @Route("/external/archiveTaskList/{identifier}/{id}", name="archiveTaskListExternal")
      */
-    public function archiveTaskListExternal($id)
+    public function archiveTaskListExternal($identifier, $id)
     {
         $entityManager = $this->getDoctrine()->getManager();
-        $tasklist = $entityManager->getRepository(TodoList::class)->find($id);
-        $tasklist->setIsArchived(1);
-        $entityManager->persist($tasklist);
+        $autorisation = $entityManager->getRepository(\App\Entity\OutsideAccess::class)->findBy(array('identifier' => $identifier));
+
+        if (!$autorisation) {
+            throw $this->createNotFoundException(
+                'Invalid code'
+            );
+        }
+        
+        $TodoList = $entityManager->getRepository(TodoList::class)->find($id);
+
+        if($autorisation[0]->getIdProject() != $TodoList->getIdProject())
+        {
+            throw $this->createNotFoundException(
+            'Not authorized'
+            );
+        }
+
+        $TodoList->setIsArchived(1);
+        $entityManager->persist($TodoList);
         $entityManager->flush();
     }
 
@@ -194,14 +214,29 @@ class ExternalController extends AbstractController
      *
      * Matches /external/isNotDone/*
      *
-     * @Route("/external/isNotDone/{projectId}", name="isNotDoneExternal")
+     * @Route("/external/isNotDone/{identifier}/{projectId}", name="isNotDoneExternal")
      */
-    public function isNotDoneExternal($projectId)
+    public function isNotDoneExternal($identifier, $projectId)
     {
         $entityManager = $this->getDoctrine()->getManager();
-        $tasklist = $entityManager->getRepository(TodoTaskList::class)->find($id);
-        $task->setIsDone(0);
-        $entityManager->persist($task);
+        $autorisation = $entityManager->getRepository(\App\Entity\OutsideAccess::class)->findBy(array('identifier' => $identifier));
+
+        if (!$autorisation) {
+            throw $this->createNotFoundException(
+                'Invalid code'
+            );
+        }
+        $TodoTaskList = $entityManager->getRepository(TodoTaskList::class)->find($id);
+        
+        if($autorisation[0]->getIdProject() != $TodoTaskList->getIdProject())
+        {
+            throw $this->createNotFoundException(
+            'Not authorized'
+            );
+        }
+
+        $TodoTaskList->setIsDone(0);
+        $entityManager->persist($TodoTaskList);
         $entityManager->flush();
     }
 
@@ -211,14 +246,29 @@ class ExternalController extends AbstractController
      *
      * Matches /external/isDone/*
      *
-     * @Route("/external/isDone/{id}", name="isDoneExternal")
+     * @Route("/external/isDone/{identifier}/{id}", name="isDoneExternal")
      */
-    public function isDoneExternal($id)
+    public function isDoneExternal($identifier, $id)
     {
         $entityManager = $this->getDoctrine()->getManager();
-        $task = $entityManager->getRepository(TodoTaskList::class)->find($id);
-        $task->setIsDone(1);
-        $entityManager->persist($task);
+        $autorisation = $entityManager->getRepository(\App\Entity\OutsideAccess::class)->findBy(array('identifier' => $identifier));
+
+        if (!$autorisation) {
+            throw $this->createNotFoundException(
+                'Invalid code'
+            );
+        }
+        $TodoTaskList = $entityManager->getRepository(TodoTaskList::class)->find($id);
+
+        if($autorisation[0]->getIdProject() != $TodoTaskList->getIdProject())
+        {
+            throw $this->createNotFoundException(
+            'Not authorized'
+            );
+        }
+
+        $TodoTaskList->setIsDone(1);
+        $entityManager->persist($TodoTaskList);
         $entityManager->flush();
     }
 
@@ -228,14 +278,30 @@ class ExternalController extends AbstractController
      *
      * Matches /external/restoreTaskList/*
      *
-     * @Route("/external/restoreTaskList/{id}", name="restoreTaskListExternal")
+     * @Route("/external/restoreTaskList/{identifier}/{id}", name="restoreTaskListExternal")
      */
-    public function restoreTaskListExternal($id)
+    public function restoreTaskListExternal($identifier, $id)
     {
         $entityManager = $this->getDoctrine()->getManager();
-        $tasklist = $entityManager->getRepository(TodoList::class)->find($id);
-        $tasklist->setIsArchived(0);
-        $entityManager->persist($tasklist);
+        $autorisation = $entityManager->getRepository(\App\Entity\OutsideAccess::class)->findBy(array('identifier' => $identifier));
+
+        if (!$autorisation) {
+            throw $this->createNotFoundException(
+                'Invalid code'
+            );
+        }
+        
+        $TodoList = $entityManager->getRepository(TodoList::class)->find($id);
+
+        if($autorisation[0]->getIdProject() != $TodoList->getIdProject())
+        {
+            throw $this->createNotFoundException(
+            'Not authorized'
+            );
+        }
+
+        $TodoList->setIsArchived(0);
+        $entityManager->persist($TodoList);
         $entityManager->flush();
     }
 
@@ -243,20 +309,36 @@ class ExternalController extends AbstractController
      *
      * Route for external people accessing a project if they have an identifier. Here they update a task name. Only used by Jquery.
 
-     * @Route("/external/updateTask/{id}/{name}", name="updateTaskExternal")
+     * @Route("/external/updateTask/{identifier}/{id}/{name}", name="updateTaskExternal")
      */
-    public function updateTaskExternal($id, $name)
+    public function updateTaskExternal($identifier, $id, $name)
     {
         $entityManager = $this->getDoctrine()->getManager();
-        $project = $entityManager->getRepository(TodoTaskList::class)->find($id);
+        $autorisation = $entityManager->getRepository(\App\Entity\OutsideAccess::class)->findBy(array('identifier' => $identifier));
 
-        if (!$project) {
+        if (!$autorisation) {
+            throw $this->createNotFoundException(
+                'Invalid code'
+            );
+        }        
+        
+        $TodoTaskList = $entityManager->getRepository(TodoTaskList::class)->find($id);
+
+        if (!$TodoTaskList) {
             throw $this->createNotFoundException(
                 'No product found for id ' . $id
             );
         }
 
-        $project->setName($name);
+        
+        if($autorisation[0]->getIdProject() != $TodoTaskList->getIdProject())
+        {
+            throw $this->createNotFoundException(
+            'Not authorized'
+            );
+        }
+
+        $TodoTaskList->setName($name);
         $entityManager->flush();
     }
 
@@ -266,13 +348,28 @@ class ExternalController extends AbstractController
      *
      * Matches /external/delTaskList/*
      *
-     * @Route("/external/delTaskList/{id}", name="delTaskListExternal")
+     * @Route("/external/delTaskList/{identifier}/{id}", name="delTaskListExternal")
      */
-    public function delTaskListExternal($id)
+    public function delTaskListExternal($identifier, $id)
     {
         $entityManager = $this->getDoctrine()->getManager();
-        $tasklist = $entityManager->getRepository(TodoList::class)->find($id);
-        $entityManager->remove($tasklist);
+        $autorisation = $entityManager->getRepository(\App\Entity\OutsideAccess::class)->findBy(array('identifier' => $identifier));
+
+        if (!$autorisation) {
+            throw $this->createNotFoundException(
+                'Invalid code'
+            );
+        }        
+        $task = $entityManager->getRepository(TodoList::class)->find($id);
+
+        if($autorisation[0]->getIdProject() != $task->getIdProject())
+        {
+            throw $this->createNotFoundException(
+            'Not authorized'
+            );
+        }
+
+        $entityManager->remove($task);
         $entityManager->flush();
     }
 
@@ -282,12 +379,27 @@ class ExternalController extends AbstractController
      *
      * Matches /external/delTask/*
      *
-     * @Route("/external/delTask/{id}", name="delTaskExternal")
+     * @Route("/external/delTask/{identifier}/{id}", name="delTaskExternal")
      */
-    public function delTaskExternal($id)
+    public function delTaskExternal($identifier, $id)
     {
         $entityManager = $this->getDoctrine()->getManager();
+        $autorisation = $entityManager->getRepository(\App\Entity\OutsideAccess::class)->findBy(array('identifier' => $identifier));
+
+        if (!$autorisation) {
+            throw $this->createNotFoundException(
+                'Invalid code'
+            );
+        }        
         $tasklist = $entityManager->getRepository(TodoTaskList::class)->find($id);
+
+        if($autorisation[0]->getIdProject() != $tasklist->getIdProject())
+        {
+            throw $this->createNotFoundException(
+            'Not authorized'
+            );
+        }
+
         $entityManager->remove($tasklist);
         $entityManager->flush();
     }
@@ -298,14 +410,21 @@ class ExternalController extends AbstractController
      *
      * Matches /external/addTaskList/*
      *
-     * @Route("/external/addTaskList/{projectId}/{name}", name="addTaskListExternal")
+     * @Route("/external/addTaskList/{identifier}/{projectId}/{name}", name="addTaskListExternal")
      */
-    public function addTaskListExternal($projectId, $name)
+    public function addTaskListExternal($identifier, $projectId, $name)
     {
         $entityManager = $this->getDoctrine()->getManager();
+        $autorisation = $entityManager->getRepository(\App\Entity\OutsideAccess::class)->findBy(array('identifier' => $identifier));
+
+        if (!$autorisation) {
+            throw $this->createNotFoundException(
+                'Invalid code'
+            );
+        }        
         $tasklist = new TodoList();
         $tasklist->setName($name);
-        $tasklist->setIdProject($projectId);
+        $tasklist->setIdProject($autorisation[0]->getIdProject());
         $tasklist->setIsArchived(0);
         $entityManager->persist($tasklist);
         $entityManager->flush();
@@ -317,14 +436,21 @@ class ExternalController extends AbstractController
      *
      * Matches /external/addTask/*
      *
-     * @Route("/external/addTask/{projectId}/{taskListId}/{val}", name="addTaskExternal")
+     * @Route("/external/addTask/{identifier}/{projectId}/{taskListId}/{val}", name="addTaskExternal")
      */
-    public function addTaskExternal($projectId, $taskListId, $val)
+    public function addTaskExternal($identifier, $projectId, $taskListId, $val)
     {
         $entityManager = $this->getDoctrine()->getManager();
+        $autorisation = $entityManager->getRepository(\App\Entity\OutsideAccess::class)->findBy(array('identifier' => $identifier));
+
+        if (!$autorisation) {
+            throw $this->createNotFoundException(
+                'Invalid code'
+            );
+        }        
         $task = new TodoTaskList();
         $task->setName($val);
-        $task->setIdProject($projectId);
+        $task->setIdProject($autorisation[0]->getIdProject());
         $task->setIdList($taskListId);
         $task->setIsDone(0);
         $entityManager->persist($task);
@@ -335,12 +461,20 @@ class ExternalController extends AbstractController
      *
      * Route for external people accessing a project if they have an identifier. Here they update a task. Only used by Jquery.
      *
-     * @Route("/external/update/{id}/{name}", name="projectupdateExternal")
+     * @Route("/external/update/{identifier}/{id}/{name}", name="projectupdateExternal")
      */
-    public function projectupdateExternal($id, $name)
+    public function projectupdateExternal($identifier, $id, $name)
     {
         $entityManager = $this->getDoctrine()->getManager();
-        $project = $entityManager->getRepository(Project::class)->find($id);
+        $autorisation = $entityManager->getRepository(\App\Entity\OutsideAccess::class)->findBy(array('identifier' => $identifier));
+
+        if (!$autorisation) {
+            throw $this->createNotFoundException(
+                'Invalid code'
+            );
+        }
+        
+        $project = $entityManager->getRepository(Project::class)->find($autorisation[0]->getIdProject());
 
         if (!$project) {
             throw $this->createNotFoundException(
