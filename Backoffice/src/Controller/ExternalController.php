@@ -205,6 +205,13 @@ class ExternalController extends AbstractController
 
         $TodoList->setIsArchived(1);
         $entityManager->persist($TodoList);
+
+        $log = new Log();
+        $log->setUser($identifier);
+        $log->setAction('Archived the tasklist: ' . $id);
+        $log->setIdProject($autorisation[0]->getIdProject());
+        $entityManager->persist($log);
+
         $entityManager->flush();
     }
 
@@ -237,6 +244,13 @@ class ExternalController extends AbstractController
 
         $TodoTaskList->setIsDone(0);
         $entityManager->persist($TodoTaskList);
+
+        $log = new Log();
+        $log->setUser($identifier);
+        $log->setAction('Task not done: ' . $id);
+        $log->setIdProject($autorisation[0]->getIdProject());
+        $entityManager->persist($log);
+
         $entityManager->flush();
     }
 
@@ -269,6 +283,13 @@ class ExternalController extends AbstractController
 
         $TodoTaskList->setIsDone(1);
         $entityManager->persist($TodoTaskList);
+
+        $log = new Log();
+        $log->setUser($identifier);
+        $log->setAction('task done: ' . $id);
+        $log->setIdProject($autorisation[0]->getIdProject());
+        $entityManager->persist($log);
+
         $entityManager->flush();
     }
 
@@ -302,6 +323,13 @@ class ExternalController extends AbstractController
 
         $TodoList->setIsArchived(0);
         $entityManager->persist($TodoList);
+
+        $log = new Log();
+        $log->setUser($identifier);
+        $log->setAction('Restore tasklist: ' . $id);
+        $log->setIdProject($autorisation[0]->getIdProject());
+        $entityManager->persist($log);
+
         $entityManager->flush();
     }
 
@@ -339,6 +367,13 @@ class ExternalController extends AbstractController
         }
 
         $TodoTaskList->setName($name);
+
+        $log = new Log();
+        $log->setUser($identifier);
+        $log->setAction('Updated task name: ' . $id . ' - '.$name);
+        $log->setIdProject($autorisation[0]->getIdProject());
+        $entityManager->persist($log);
+
         $entityManager->flush();
     }
 
@@ -370,6 +405,13 @@ class ExternalController extends AbstractController
         }
 
         $entityManager->remove($task);
+
+        $log = new Log();
+        $log->setUser($identifier);
+        $log->setAction('Removed task list: ' . $id);
+        $log->setIdProject($autorisation[0]->getIdProject());
+        $entityManager->persist($log);
+
         $entityManager->flush();
     }
 
@@ -401,6 +443,13 @@ class ExternalController extends AbstractController
         }
 
         $entityManager->remove($tasklist);
+
+        $log = new Log();
+        $log->setUser($identifier);
+        $log->setAction('Remove task: ' . $id);
+        $log->setIdProject($autorisation[0]->getIdProject());
+        $entityManager->persist($log);
+
         $entityManager->flush();
     }
 
@@ -427,6 +476,13 @@ class ExternalController extends AbstractController
         $tasklist->setIdProject($autorisation[0]->getIdProject());
         $tasklist->setIsArchived(0);
         $entityManager->persist($tasklist);
+
+        $log = new Log();
+        $log->setUser($identifier);
+        $log->setAction('Add task list at the project: ' . $id . '. With the name: '. $name);
+        $log->setIdProject($autorisation[0]->getIdProject());
+        $entityManager->persist($log);
+
         $entityManager->flush();
     }
 
@@ -454,6 +510,13 @@ class ExternalController extends AbstractController
         $task->setIdList($taskListId);
         $task->setIsDone(0);
         $entityManager->persist($task);
+
+        $log = new Log();
+        $log->setUser($identifier);
+        $log->setAction('Add a task. On the project ' . $projectId . ' on the tasklist '. $taskListId . ' with the name '.$val);
+        $log->setIdProject($autorisation[0]->getIdProject());
+        $entityManager->persist($log);
+
         $entityManager->flush();
     }
 
@@ -481,8 +544,15 @@ class ExternalController extends AbstractController
                 'No product found for id ' . $id
             );
         }
-
+        
         $project->setName($name);
+
+        $log = new Log();
+        $log->setUser($identifier);
+        $log->setAction('Update the project name on the project ' . $id . ' with the name '. $name);
+        $log->setIdProject($autorisation[0]->getIdProject());
+        $entityManager->persist($log);
+
         $entityManager->flush();
     }
 }
