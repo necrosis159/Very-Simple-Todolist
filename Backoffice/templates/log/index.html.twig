@@ -13,12 +13,12 @@
             font: 18px/1.5 sans-serif;
         }
     </style>
-
     <div class="logs">
         <h1>Liste des accès externe</h1>
         <table id="table_id" class="display">
             <thead>
                 <tr>
+                    <th>Action effectuée le</th>
                     <th>Utilisateur</th>
                     <th>Id du projet</th>
                     <th>Action</th>
@@ -26,7 +26,9 @@
             </thead>
             <tbody>
                 {% for item in logs %}
+                
                 <tr>
+                    <td>{{ item.date }}</td>
                     <td>{{item.user}}</td>
                     <td>{{item.idProject}}</td>
                     <td>{{item.action}}</td>
@@ -37,7 +39,9 @@
     </div>
     <script>
         $(document).ready(function () {
-            $('#table_id').DataTable();
+            $('#table_id').DataTable( {
+        "order": [[ 0, "desc" ]]
+    } );
         });
     </script>
 {% endblock %}

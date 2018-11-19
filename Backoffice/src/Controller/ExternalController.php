@@ -479,7 +479,7 @@ class ExternalController extends AbstractController
 
         $log = new Log();
         $log->setUser($identifier);
-        $log->setAction('Add task list at the project: ' . $id . '. With the name: '. $name);
+        $log->setAction('Add task list at the project: ' . $projectId . '. With the name: '. $name);
         $log->setIdProject($autorisation[0]->getIdProject());
         $entityManager->persist($log);
 
